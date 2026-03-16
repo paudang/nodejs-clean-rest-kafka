@@ -1,0 +1,20 @@
+# Add New Feature
+
+I want to add a new feature to the existing application. 
+Please follow the strict standards defined in the project context.
+
+## Feature Description
+[INSERT EXPLANATION OF WHAT YOU WANT TO ADD HERE]
+
+## Implementation Guidelines
+
+Please provide the code implementation following these steps:
+
+1. **Plan first**: Outline the files you need to create/modify and the logic they'll contain.
+2. **Domain/Entity**: Define the core entity structure or interfaces if applicable.
+3. **Use Case**: Implement the business logic handling the feature.
+4. **Adapter (Controller & Route)**: Create the necessary endpoints and validate input.
+5. **Infrastructure (Repository)**: Implement database queries or external service calls.
+6. **Testing**: Write comprehensive Jest unit tests covering the "Happy Path" and "Edge Cases/Errors" (AAA pattern). Remember, our coverage requirement is > 70%!
+
+Please provide the plan first so I can review it before we write the code.

@@ -1,0 +1,46 @@
+import { Request, Response, NextFunction } from 'express';
+import { HTTP_STATUS } from '@/utils/httpCodes';
+import { UserRepository } from '@/infrastructure/repositories/UserRepository';
+import CreateUser from '@/usecases/createUser';
+import GetAllUsers from '@/usecases/getAllUsers';
+import logger from '@/infrastructure/log/logger';
+
+export class UserController {
+    private createUserUseCase: CreateUser;
+    private getAllUsersUseCase: GetAllUsers;
+
+    constructor() {
+        const userRepository = new UserRepository();
+        this.createUserUseCase = new CreateUser(userRepository);
+        this.getAllUsersUseCase = new GetAllUsers(userRepository);
+    }
+
+    async createUser(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { name, email } = req.body;
+            const user = await this.createUserUseCase.execute(name, email);
+            const { kafkaService } = await import('@/infrastructure/messaging/kafkaClient');
+            await kafkaService.sendMessage('user-topic', JSON.stringify({
+                action: 'USER_CREATED',
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                payload: { id: (user as any).id || (user as any)._id, email: user.email }
+            }));
+            res.status(HTTP_STATUS.CREATED).json(user);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            logger.error('UserController CreateUser Error:', message);
+            next(error);
+        }
+    }
+
+    async getUsers(req: Request, res: Response, next: NextFunction) {
+        try {
+            const users = await this.getAllUsersUseCase.execute();
+            res.json(users);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            logger.error('UserController GetUsers Error:', message);
+            next(error);
+        }
+    }
+}

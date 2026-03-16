@@ -1,0 +1,45 @@
+# Cursor AI Coding Rules for nodejs-clean-rest-kafka
+
+## Project Context
+You are an expert working on **nodejs-clean-rest-kafka**.
+- **Project Goal**: [Replace this with your business logic, e.g., E-commerce API]
+- **Language**: TypeScript
+- **Architecture**: Clean Architecture
+- **Database**: MySQL
+- **Communication**: Kafka
+
+## Excluded Files/Folders
+When indexing or searching the workspace, ignore the following paths to prevent context pollution:
+- `node_modules/`
+- `dist/`
+- `build/`
+- `coverage/`
+- `.git/`
+
+## Strict Rules
+
+### 1. Testing First
+- Every new service or controller method MUST have a test file in `tests/`.
+- **Coverage Gate**: Aim for > 70% coverage (Statement/Line/Function/Branch).
+- **Format**: Use Jest with the AAA (Arrange, Act, Assert) pattern.
+- **Isolation**: Mock external dependencies (DB, Redis, etc.) using `jest.mock()`.
+
+### 2. Error Handling
+- Do NOT use generic `Error`.
+- Use custom classes from `src/errors/` (e.g., `ApiError`, `NotFoundError`, `BadRequestError`).
+- Use `HTTP_STATUS` constants from `@/utils/httpCodes` for status codes.
+
+### 3. File Naming & Style
+- **Controllers**: camelCase (e.g., `userController.ts`).
+- **Services**: camelCase (e.g., `userService.ts`).
+- **Routes**: camelCase (e.g., `userRoutes.ts`).
+- **Imports**: Use path aliases (e.g., `@/services/...`) instead of relative paths.
+- **Typing**: Ensure strong typing for interfaces and DTOs. Do not use `any` unless absolutely necessary.
+
+### 4. Architecture Standards
+- Enforce strict separation of concerns:
+  - `domain`: Entities and enterprise business rules.
+  - `usecases`: Application business rules.
+  - `interfaces`: Controllers and Routes.
+  - `infrastructure`: Frameworks, Database, Caching, and Web Server.
+- Dependencies point inward toward the `domain`.
