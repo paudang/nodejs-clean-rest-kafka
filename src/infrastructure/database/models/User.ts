@@ -23,12 +23,17 @@ User.init(
       allowNull: false,
       unique: true,
     },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize,
     tableName: 'users',
     underscored: true,
-  }
+    paranoid: true,
+  },
 );
 
 export default User;

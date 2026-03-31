@@ -1,3 +1,4 @@
+import { env } from '@/config/env';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -12,8 +13,6 @@ import userRoutes from '@/interfaces/routes/userRoutes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpecs from '@/config/swagger';
 import { kafkaService } from '@/infrastructure/messaging/kafkaClient';
-import { env } from '@/config/env';
-
 const app = express();
 const port = env.PORT;
 
@@ -33,38 +32,40 @@ app.use('/health', healthRoutes);
 
 // Start Server Logic
 const startServer = async () => {
-    app.use(errorMiddleware);
-    const server = app.listen(port, () => {
-        logger.info(`Server running on port ${port}`);
-        kafkaService.connect()
-            .then(async () => {
-                logger.info('Kafka connected');
-            })
-            .catch(err => {
-                logger.error('Failed to connect to Kafka after retries:', (err as Error).message);
-            });
-    });
+  app.use(errorMiddleware);
+  const server = app.listen(port, () => {
+    logger.info(`Server running on port ${port}`);
+    kafkaService
+      .connect()
+      .then(async () => {
+        logger.info('Kafka connected');
+      })
+      .catch((err) => {
+        logger.error('Failed to connect to Kafka after retries:', (err as Error).message);
+      });
+  });
 
-    setupGracefulShutdown(server, kafkaService);
+  setupGracefulShutdown(server, kafkaService);
 };
 
 // Database Sync
+import sequelize from '@/infrastructure/database/database';
+
 const syncDatabase = async () => {
-    let retries = 30;
-    while (retries) {
-        try {
-            const sequelize = (await import('@/infrastructure/database/database')).default;
-            await sequelize.sync();
-            logger.info('Database synced');
-            await startServer();
-            break;
-        } catch (error) {
-            logger.error('Error syncing database:', error);
-            retries -= 1;
-            logger.info(`Retries left: ${retries}`);
-            await new Promise(res => setTimeout(res, 5000));
-        }
+  let retries = 30;
+  while (retries) {
+    try {
+      await sequelize.sync();
+      logger.info('Database synced');
+      await startServer();
+      break;
+    } catch (error) {
+      logger.error('Error syncing database:', error);
+      retries -= 1;
+      logger.info(`Retries left: ${retries}`);
+      await new Promise((res) => setTimeout(res, 5000));
     }
+  }
 };
 
 syncDatabase();

@@ -14,6 +14,9 @@ const envSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
   DB_PORT: z.string().transform(Number),
+  REDIS_HOST: z.string(),
+  REDIS_PORT: z.string().transform(Number),
+  REDIS_PASSWORD: z.string().optional(),
   KAFKA_BROKER: z.string(),
 });
 

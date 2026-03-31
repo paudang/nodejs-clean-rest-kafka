@@ -13,6 +13,7 @@ You are an expert working on **nodejs-clean-rest-kafka**.
 - **Architecture**: Clean Architecture
 - **Database**: MySQL
 - **Communication Protocol**: Kafka
+- **Caching**: Redis
 
 ## High-Level Architecture
 We use Clean Architecture. The project separates concerns into:
@@ -22,7 +23,7 @@ We use Clean Architecture. The project separates concerns into:
 - `src/infrastructure`: External tools (Database, Web Server, Config, Caching).
 
 ## Core Standards
-1. **Testing**: We enforce > 70% coverage. Tests use Jest and the AAA (Arrange, Act, Assert) pattern.
+1. **Testing**: We enforce > 80% coverage. Tests use Jest and the AAA (Arrange, Act, Assert) pattern.
 2. **Error Handling**: We use centralized custom errors (e.g., `ApiError`) and global error middleware. Status codes come from standard constants, not hardcoded numbers.
 3. **Paths & Naming**:
    - We use `@/` path aliases for internal imports.

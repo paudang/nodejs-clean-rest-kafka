@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import logger from '@/infrastructure/log/logger';
 import { HTTP_STATUS } from '@/utils/httpCodes';
+import { ERROR_MESSAGES } from '@/utils/errorMessages';
+import sequelize from '@/infrastructure/database/database';
 
 const router = Router();
 
@@ -10,18 +12,17 @@ router.get('/', async (req: Request, res: Response) => {
     uptime: process.uptime(),
     memory: process.memoryUsage(),
     database: 'disconnected',
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
   logger.info('Health Check');
 
   try {
-    const sequelize = (await import('@/infrastructure/database/database')).default;
     await sequelize.authenticate();
     healthData.database = 'connected';
   } catch (err) {
     healthData.database = 'error';
     healthData.status = 'DOWN';
-    logger.error('Health Check Database Ping Failed:', err);
+    logger.error(`${ERROR_MESSAGES.DATABASE_PING_FAILED}:`, err);
     return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json(healthData);
   }
 

@@ -4,67 +4,85 @@
 ![License](https://img.shields.io/badge/License-ISC-blue.svg)
 ![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue.svg)
 
-A production-ready Node.js microservice generated with **Clean Architecture** and **MySQL**.
-This project comes pre-configured with industry-standard tooling for **Code Quality**, **Testing**, and **Security**.
+[![Snyk Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/github/yourusername/nodejs-clean-rest-kafka?style=flat-square)](https://snyk.io/)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nodejs-clean-rest-kafka&metric=alert_status)](https://sonarcloud.io/)
+
+
+A production-ready Node.js microservice generated with **Clean Architecture** and **MySQL**. 
+This project follows a strict **7-Step Production-Ready Process** to ensure quality and scalability from day one.
+
+---
+
+## 🚀 7-Step Production-Ready Process
+
+1.  **Initialize Git**: `git init` (Required for Husky hooks and security gates).
+2.  **Install Dependencies**: `npm install`.
+3.  **Configure Environment**: Copy `.env.example` to `.env`.
+4.  **Start Infrastructure**: `docker-compose up -d db redis kafka`.
+5.  **Run Development**: `npm run dev`.
+6.  **Verify Standards**: `npm run lint` and `npm test` (Enforce 80% coverage).
+7.  **Build & Deploy**: `npm run build` followed by `npm run deploy` (via PM2).
+
+---
 
 ## 🚀 Key Features
 
 -   **Architecture**: Clean Architecture (Domain, UseCases, Infrastructure).
--   **Database**: MySQL with **Flyway** migrations.
--   **Security**: Helmet, CORS, Rate Limiting, HPP.
--   **Quality**: Eslint, Prettier, Husky, Lint-Staged.
--   **Testing**: Jest (Unit & Integration).
--   **DevOps**: Multi-stage Docker build, CI/CD ready.
+-   **Database**: MySQL (via Sequelize).
+-   **Security**: Helmet, CORS, Rate Limiting, HPP, Snyk SCA.
+-   **Quality**: 80%+ Test Coverage, Eslint, Prettier, Husky.
+-   **DevOps**: Multi-stage Docker, CI/CD ready (GitHub/GitLab/Jenkins).
+-   **Enterprise Hardening**: SonarCloud SAST, Security Policies.
 
-## 🔄 CI/CD Pipeline
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/yourusername/nodejs-clean-rest-kafka/ci.yml?branch=main)
-This project includes a **GitHub Actions** workflow located in `.github/workflows/ci.yml`.
-It automatically runs:
--   Linting
--   Tests
--   Builds
+## 📂 Project Structure
 
-## 🛠️ Getting Started
+The project follows **Clean Architecture** principles.
+- **Domain**: Pure business logic (Entities/Interfaces).
+- **Use Case**: Application-specific business rules.
+- **Infrastructure**: External concerns (DB, Messaging, Caching).
+
+---
+
+## 🛠️ Detailed Getting Started
+
+Follow the **🚀 7-Step Production-Ready Process** summary at the top, or follow these detailed instructions:
 
 ### 1. Prerequisites
 -   Node.js (v18+)
 -   Docker & Docker Compose
 
-### 2. Quick Start
+### 2. Environment Setup
+Copy the example environment file and adjust the values as needed:
 ```bash
-# Initialize Git (Required for Husky)
+cp .env.example .env
+```
+
+### 3. Infrastructure & App Launch
+```bash
+# Initialize Git for security hooks
 git init
 
 # Install dependencies
 npm install
 
-# Setup Git Hooks (Husky)
-npm run prepare
+# Start required services
+docker-compose up -d db redis kafka
 
-# Start Infrastructure (DB, etc.)
-docker-compose up -d
-
-# Run Development Server
+# Run the app in development mode
 npm run dev
 ```
 
-### 3. Development Standards
-Ensure your code meets quality standards before committing:
-
+### 4. Quality & Standards
 ```bash
-# Run Linter
+# Lint & Format
 npm run lint
-
-# Run Tests
-npm test
-
-# Format Code
 npm run format
+
+# Run Unit/Integration Tests
+npm test
+npm run test:coverage
 ```
 
-## 📂 Project Structure
-
-The project follows **Clean Architecture** principles.
 Microservices communication handled via **Kafka**.
 
 ## 📡 Testing Kafka Asynchronous Flow
@@ -73,7 +91,7 @@ This project demonstrates a production-ready Kafka flow:
 2. **Consumer**: `WelcomeEmailConsumer` listens to `user-topic` and simulates sending an email.
 
 ### How to verify:
-1. Ensure infrastructure is running: `docker-compose up -d db zookeeper kafka`
+1. Ensure infrastructure is running: `docker-compose up -d db redis kafka`
 2. Start the app: `npm run dev`
 3. Trigger an event by creating a user (via Postman or curl):
    ```bash
@@ -88,6 +106,17 @@ This project demonstrates a production-ready Kafka flow:
    [Kafka] Consumer: 📧 Sending welcome email to 'kafka@example.com'... Done!
    ```
 
+### 🛠️ Kafka Troubleshooting
+If the connection or events are failing:
+1. **Check Docker**: Ensure Kafka container is running (`docker ps`).
+2. **Verify Broker**: `KAFKA_BROKER` in `.env` must match your host/port (standard: 9093).
+3. **Advertised Listeners**: If using Windows/WSL, check `docker-compose.yml` advertisers are correct.
+4. **Logs**: Check `docker compose logs -f kafka` for start-up errors.
+
+## ⚡ Caching
+This project uses **Redis** for caching.
+- **Client**: `ioredis`
+- **Connection**: Configured via `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` in `.env`.
 
 ## 📝 Logging
 This project uses **Winston** for structured logging.
@@ -104,7 +133,7 @@ To run the Node.js application locally while using Docker for the infrastructure
 
 ```bash
 # Start infrastructure
-docker-compose up -d db zookeeper kafka
+docker-compose up -d db redis kafka
 
 # Start the application
 npm run dev
@@ -123,10 +152,10 @@ docker build -t nodejs-clean-rest-kafka .
 # Run Container (attached to the compose network)
 docker run -p 3000:3000 --network nodejs-clean-rest-kafka_default \
   -e DB_HOST=db \
+  -e REDIS_HOST=redis \
   -e KAFKA_BROKER=kafka:29092 \
   nodejs-clean-rest-kafka
 ```
-
 ## 🚀 PM2 Deployment (VPS/EC2)
 This project is pre-configured for direct deployment to a VPS/EC2 instance using **PM2** (via `ecosystem.config.js`).
 1. Install dependencies
@@ -136,7 +165,7 @@ npm install
 2. **Start Infrastructure (DB, Redis, Kafka, etc.) in the background**
 *(This specifically starts the background services without running the application inside Docker, allowing PM2 to handle it).*
 ```bash
-docker-compose up -d db zookeeper kafka
+docker-compose up -d db redis kafka
 ```
 3. **Wait 5-10s** for the database to fully initialize.
 4. **Deploy the App using PM2 in Cluster Mode**
@@ -163,12 +192,17 @@ docker-compose down
 -   **Rate Limiting**: Protects against DDoS / Brute-force.
 -   **HPP**: Prevents HTTP Parameter Pollution attacks.
 
+### 🛡️ Enterprise Hardening (Big Tech Standard)
+-   **Snyk SCA**: Run `npm run snyk:test` for dependency scanning.
+-   **SonarCloud**: Automated SAST on every Push/PR.
+-   **Digital Guardians**: Recommended Gitleaks integration for secret protection.
+-   **Security Policy**: Standard `SECURITY.md` for vulnerability reporting.
 
 ## 🤖 AI-Native Development
 
 This project is "AI-Ready" out of the box. We have pre-configured industry-leading AI context files to bridge the gap between "Generated Code" and "AI-Assisted Development."
 
 - **Magic Defaults**: We've automatically tailored your AI context to focus on **nodejs-clean-rest-kafka** and its specific architectural stack (Clean Architecture, MySQL, etc.).
-- **Use Cursor?** We've configured **`.cursorrules`** at the root. It enforces project standards (70% coverage, MVC/Clean) directly within the editor. 
+- **Use Cursor?** We've configured **`.cursorrules`** at the root. It enforces project standards (80% coverage, MVC/Clean) directly within the editor. 
   - *Pro-tip*: You can customize the `Project Goal` placeholder in `.cursorrules` to help the AI understand your specific business logic!
 - **Use ChatGPT/Gemini/Claude?** Check the **`prompts/`** directory. It contains highly-specialized Agent Skill templates. You can copy-paste these into any LLM to give it a "Senior Developer" understanding of your codebase immediately.
