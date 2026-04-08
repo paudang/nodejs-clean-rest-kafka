@@ -5,7 +5,7 @@ You are an expert working on **nodejs-clean-rest-kafka**.
 - **Project Goal**: [Replace this with your business logic, e.g., E-commerce API]
 - **Language**: TypeScript
 - **Architecture**: Clean Architecture
-- **Database**: MySQL
+- **Database**: PostgreSQL
 - **Communication**: Kafka
 
 ## Excluded Files/Folders

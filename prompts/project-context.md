@@ -11,7 +11,7 @@ You are an expert working on **nodejs-clean-rest-kafka**.
 ## Tech Stack
 - **Language**: TypeScript
 - **Architecture**: Clean Architecture
-- **Database**: MySQL
+- **Database**: PostgreSQL
 - **Communication Protocol**: Kafka
 - **Caching**: Redis
 
